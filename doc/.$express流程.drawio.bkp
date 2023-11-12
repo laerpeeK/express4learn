@@ -1,0 +1,19 @@
+<mxfile host="Electron" modified="2023-09-01T00:43:39.092Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.1 Chrome/112.0.5615.204 Electron/24.6.1 Safari/537.36" etag="lgv15OBoFY_wXpU_i7n5" version="21.6.1" type="device">
+  <diagram name="第 1 页" id="US7-X-SZgHOrYmnCYzjV">
+    <mxGraphModel dx="2261" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="05rrLEFXc6JBpu6p5pXZ-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="05rrLEFXc6JBpu6p5pXZ-2" target="05rrLEFXc6JBpu6p5pXZ-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="05rrLEFXc6JBpu6p5pXZ-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;const app = express()&lt;br&gt;app: function (req, res, next) {}&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-777" y="30" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="05rrLEFXc6JBpu6p5pXZ-6" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;app.[EventEmitter.protoype.xxx]&lt;br&gt;app.addEventListener(eventName, handler)&lt;br&gt;app.emit(eventName, [,...args])&lt;br&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;labelPosition=center;verticalLabelPosition=middle;" vertex="1" parent="1">
+          <mxGeometry x="-827" y="130" width="300" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
