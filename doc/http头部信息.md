@@ -1,4 +1,4 @@
-[MDN- http标头详情](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Link)
+[MDN- http标头详情](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers)
 
 - Referrer(Referer)：请求当前资源的客户端来源。
 
@@ -23,3 +23,5 @@
 
 - Content-Encoding: 实体消息编码的类型。
   1. https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Content-Encoding
+
+- X-Forwarded-Proto
