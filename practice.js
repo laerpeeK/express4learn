@@ -1,7 +1,7 @@
 const express = require('./index')
 const app = express()
 
-app.use(function (req, res, next) {
+app.use('/users', function (req, res, next) {
   console.log('first middleware fn')
   next()
 })

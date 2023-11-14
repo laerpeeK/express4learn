@@ -78,6 +78,67 @@ describe('config', function () {
       app.set('foo', 'bar')
       assert.equal(app.get('foo'), 'bar')
     })
+
+    describe('when mounted', function () {
+      it('should default to the parent app', function () {
+        const app = express()
+        const blog = express()
+
+        app.set('title', 'Express')
+        app.use(blog)
+        assert.equal(blog.get('title'), 'Express')
+      })
+
+      it('should given precedence to the child', function () {
+        const app = express()
+        const blog = express()
+
+        app.use(blog)
+        app.set('title', 'Express')
+        blog.set('title', 'Some Blog')
+
+        assert.equal(blog.get('title'), 'Some Blog')
+      })
+
+      it('should inherit "trust proxy" setting', function () {
+        const app = express()
+        const blog = express()
+
+        function fn() { return false }
+
+        app.set('trust proxy', fn)
+        assert.equal(app.get('trust proxy'), fn)
+        assert.equal(app.get('trust proxy fn'), fn)
+
+        app.use(blog)
+
+        assert.equal(blog.get('trust proxy'), fn)
+        assert.equal(blog.get('trust proxy fn'), fn)
+      })
+
+      it('should prefer child "trust proxy" setting', function () {
+        const app = express()
+        const blog = express()
+
+        function fn1 () { return false }
+        function fn2 () { return true }
+
+        app.set('trust proxy', fn1)
+        assert.equal(app.get('trust proxy'), fn1)
+        assert.equal(app.get('trust proxy fn'), fn1)
+
+        blog.set('trust proxy', fn2)
+        assert.equal(blog.get('trust proxy'), fn2)
+        assert.equal(blog.get('trust proxy fn'), fn2)
+
+        app.use(blog)
+
+        assert.equal(app.get('trust proxy'), fn1)
+        assert.equal(app.get('trust proxy fn'), fn1)
+        assert.equal(blog.get('trust proxy'), fn2)
+        assert.equal(blog.get('trust proxy fn'), fn2)
+      })
+    })
   })
 
   describe('.enable()', function () {
