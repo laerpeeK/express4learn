@@ -1,21 +1,15 @@
 const express = require('./index')
-const app = express()
+// const app = express()
+const Router = express.Router
 
-app.use('/users', function (req, res, next) {
-  console.log('first middleware fn')
-  next()
+const router = new Router()
+
+router.use(function (req, res) {
+  throw new Error('should not be called')
 })
 
-// app.use(function (req, res, next) {
-//   console.log('second middleware fn')
-//   next(new Error('middleware fn error'))
-// })
+router.handle({ url: '', method: 'GET' }, {}, (err) => { console.log(err)})
 
-// app.use(function (err, req, res, next) {
-//   console.log('error middleware fn', err)
-//   res.end(err.message)
+// app.listen(3000, () => {
+//   console.log('the server is running at port 3000')
 // })
-
-app.listen(3000, () => {
-  console.log('the server is running at port 3000')
-})

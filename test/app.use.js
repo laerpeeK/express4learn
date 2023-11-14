@@ -18,6 +18,21 @@ describe('app', function () {
     app.use(blog)
   })
 
+  describe('.use(app)', function () {
+    it('should mount the app', function (done) {
+      const app = express()
+      const blog = express()
+
+      blog.use('/blog', function (req, res) {
+        res.end('blog')
+      })
+
+      app.use(blog)
+
+      request(app).get('/blog').expect('blog', done)
+    })
+  })
+
   describe('.use(middleware)', function () {
     it('should accept multiple arguments', function (done) {
       const app = express()
