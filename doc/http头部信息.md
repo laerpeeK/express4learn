@@ -1,5 +1,5 @@
 [MDN- http标头详情](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers)
-
+[HTTP事务剖析](https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/)
 - Referrer(Referer)：请求当前资源的客户端来源。
 
   1. https://blog.csdn.net/u012206617/article/details/123477445
