@@ -11,7 +11,7 @@ describe('Router', function () {
     const router = new Router()
 
     assert(typeof router === 'function')
-    // assert(typeof router.get === 'function')
+    assert(typeof router.get === 'function')
     assert(typeof router.handle === 'function')
     assert(typeof router.use === 'function')
   })
@@ -20,7 +20,7 @@ describe('Router', function () {
     const router = new Router()
     const another = new Router()
 
-    another.use('/bar', function (req, res) {
+    another.get('/bar', function (req, res) {
       res.end()
     })
     router.use('/foo', another)
