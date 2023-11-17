@@ -2,11 +2,16 @@ const express = require('./index')
 
 const app = express()
 
-app.get('/users', function (req, res) {})
-app.all('/users', function (req, res, next) {
-  res.setHeader('x-hit', 1)
-  res.send('ss')
+app.param('user', function (req, res, next, user) {
+  req.params.user = 'loki'
   next()
+})
+
+app.get('/:user', function (req, res, next) {
+  next('route')
+})
+app.get('/:user', function (req, res, next) {
+  res.send(req.params.user)
 })
 
 app.listen(3000, () => {
