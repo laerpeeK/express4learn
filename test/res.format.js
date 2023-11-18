@@ -123,7 +123,7 @@ describe('res', function () {
       })
 
       it('should be able to invoke other formatter', function (done) {
-        var app = express()
+        const app = express()
 
         app.use(function (req, res, next) {
           res.format({

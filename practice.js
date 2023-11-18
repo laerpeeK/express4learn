@@ -2,16 +2,8 @@ const express = require('./index')
 
 const app = express()
 
-app.param('user', function (req, res, next, user) {
-  req.params.user = 'loki'
-  next()
-})
-
-app.get('/:user', function (req, res, next) {
-  next('route')
-})
-app.get('/:user', function (req, res, next) {
-  res.send(req.params.user)
+app.use('/foo', function (req, res) {
+  res.send('saw ' + req.method + ' ' + req.url)
 })
 
 app.listen(3000, () => {

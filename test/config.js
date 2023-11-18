@@ -163,7 +163,7 @@ describe('config', function () {
     })
 
     it('should set prototype values', function () {
-      var app = express()
+      const app = express()
       app.disable('hasOwnProperty')
       assert.strictEqual(app.get('hasOwnProperty'), false)
     })

@@ -157,7 +157,7 @@ describe('res', function () {
       })
 
       it('should throw an error with invalid maxAge', function (done) {
-        var app = express()
+        const app = express()
 
         app.use(function (req, res) {
           res.cookie('name', 'tobi', { maxAge: 'foobar' })

@@ -60,7 +60,7 @@ describe('req', function () {
 
   describe('when "trust proxy" is enabled', function () {
     it('should respect X-Forwarded-Host', function (done) {
-      var app = express()
+      const app = express()
 
       app.enable('trust proxy')
 
@@ -76,7 +76,7 @@ describe('req', function () {
     })
 
     it('should ignore X-Forwarded-Host if socket addr not trusted', function (done) {
-      var app = express()
+      const app = express()
 
       app.set('trust proxy', '10.0.0.1')
 
@@ -92,7 +92,7 @@ describe('req', function () {
     })
 
     it('should default to Host', function (done) {
-      var app = express()
+      const app = express()
 
       app.enable('trust proxy')
 
