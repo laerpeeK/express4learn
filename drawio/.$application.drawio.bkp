@@ -1,0 +1,16 @@
+<mxfile host="Electron" modified="2023-11-18T17:08:00.201Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.1 Chrome/112.0.5615.204 Electron/24.6.1 Safari/537.36" etag="17Te4tYWUMJC1rtL6hae" version="21.6.1" type="device">
+  <diagram name="第 1 页" id="8pLuekl0KtoAo694ZNER">
+    <mxGraphModel dx="864" dy="516" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ol2lJSO-sMFK9XunuIDf-1" value="module.exports = createApplication" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ol2lJSO-sMFK9XunuIDf-3" value="createApplication:&lt;br style=&quot;font-size: 14px;&quot;&gt;1. app: http.createServer时传入，会在监听到request事件时被触发。传入req、res&lt;br&gt;&lt;br&gt;2. 增加app.methods：包括EventEmitter.prototype上的方法以及app.listen、app.init...等方法&lt;br&gt;&lt;br&gt;3. app.request为以自封装request对象为原型，且增加app.request.app = app&lt;br&gt;&lt;br&gt;4. app.response为以自封装response对象为原型，且增加app.response.app = app&lt;br&gt;(上述自封装request、response又分别以http.InComingMessage.prototype以及http.ServerResponse.prototype为原型)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="10" y="100" width="270" height="290" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
