@@ -230,4 +230,8 @@ describe('app.router', function () {
       })
     })
   })
+
+  describe('params', function () {
+    
+  })
 })
