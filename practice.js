@@ -2,8 +2,22 @@ const express = require('./index')
 
 const app = express()
 
-app.use('/foo', function (req, res) {
-  res.send('saw ' + req.method + ' ' + req.url)
+app.param('user', function (req, res, next, user) {
+  if (user === 'foo') throw new Error('err!')
+  req.user = user
+  next()
+})
+
+app.get('/:user/bob', function (req, res, next) {
+  next()
+})
+app.get('/foo/:user', function (req, res, next) {
+  next()
+})
+
+app.use(function (err, req, res, next) {
+  res.status(500)
+  res.send(err.message)
 })
 
 app.listen(3000, () => {
