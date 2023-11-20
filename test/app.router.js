@@ -526,4 +526,503 @@ describe('app.router', function () {
       })
     })
   })
+
+  it('should allow escaped regexp', function (done) {
+    const app = express()
+
+    app.get('/user/\\d+', function (req, res) {
+      res.end('woot')
+    })
+
+    request(app)
+      .get('/user/10')
+      .expect(200, function (err) {
+        if (err) return done(err)
+        request(app).get('/user/tj').expect(404, done)
+      })
+  })
+
+  it('should allow literal "."', function (done) {
+    const app = express()
+
+    app.get('/api/users/:from..:to', function (req, res) {
+      const from = req.params.from,
+        to = req.params.to
+
+      res.end('users from ' + from + ' to ' + to)
+    })
+
+    request(app).get('/api/users/1..50').expect('users from 1 to 50', done)
+  })
+
+  describe('*', function () {
+    it('should capture everything', function (done) {
+      const app = express()
+
+      app.get('*', function (req, res) {
+        res.end(req.params[0])
+      })
+
+      request(app).get('/user/tobi.json').expect('/user/tobi.json', done)
+    })
+
+    it('should decode the capture', function (done) {
+      const app = express()
+
+      app.get('*', function (req, res) {
+        res.end(req.params[0])
+      })
+
+      request(app)
+        .get('/user/tobi%20and%20loki.json')
+        .expect('/user/tobi and loki.json', done)
+    })
+
+    it('should denote a greedy capture group', function (done) {
+      const app = express()
+
+      app.get('/user/*.json', function (req, res) {
+        res.end(req.params[0])
+      })
+
+      request(app).get('/user/tj.json').expect('tj', done)
+    })
+
+    it('should work with several', function (done) {
+      const app = express()
+
+      app.get('/api/*.*', function (req, res) {
+        const resource = req.params[0],
+          format = req.params[1]
+        res.end(resource + ' as ' + format)
+      })
+
+      request(app)
+        .get('/api/users/foo.bar.json')
+        .expect('users/foo.bar as json', done)
+    })
+
+    it('should work cross-segment', function (done) {
+      const app = express()
+      const cb = after(2, done)
+
+      app.get('/api*', function (req, res) {
+        res.send(req.params[0])
+      })
+
+      request(app).get('/api').expect(200, '', cb)
+
+      request(app).get('/api/hey').expect(200, '/hey', cb)
+    })
+
+    it('should allow naming', function (done) {
+      const app = express()
+
+      app.get('/api/:resource(*)', function (req, res) {
+        const resource = req.params.resource
+        res.end(resource)
+      })
+
+      request(app).get('/api/users/0.json').expect('users/0.json', done)
+    })
+
+    it('should not be greedy immediately after param', function (done) {
+      const app = express()
+
+      app.get('/user/:user*', function (req, res) {
+        res.end(req.params.user)
+      })
+
+      request(app).get('/user/122').expect('122', done)
+    })
+
+    it('should eat everything after /', function (done) {
+      const app = express()
+
+      app.get('/user/:user*', function (req, res) {
+        res.end(req.params.user)
+      })
+
+      request(app).get('/user/122/aaa').expect('122', done)
+    })
+
+    it('should span multiple segments', function (done) {
+      const app = express()
+
+      app.get('/file/*', function (req, res) {
+        res.end(req.params[0])
+      })
+
+      request(app)
+        .get('/file/javascripts/jquery.js')
+        .expect('javascripts/jquery.js', done)
+    })
+
+    it('should be optional', function (done) {
+      const app = express()
+
+      app.get('/file/*', function (req, res) {
+        res.end(req.params[0])
+      })
+
+      request(app).get('/file/').expect('', done)
+    })
+
+    it('should require a preceding /', function (done) {
+      const app = express()
+
+      app.get('/file/*', function (req, res) {
+        res.end(req.params[0])
+      })
+
+      request(app).get('/file').expect(404, done)
+    })
+
+    it('should keep correct parameter indexes', function (done) {
+      const app = express()
+
+      app.get('/*/user/:id', function (req, res) {
+        res.send(req.params)
+      })
+
+      request(app).get('/1/user/2').expect(200, '{"0":"1","id":"2"}', done)
+    })
+
+    it('should work within arrays', function (done) {
+      const app = express()
+
+      app.get(['/user/:id', '/foo/*', '/:bar'], function (req, res) {
+        res.send(req.params.bar)
+      })
+
+      request(app).get('/test').expect(200, 'test', done)
+    })
+  })
+
+  describe(':name', function () {
+    it('should denote a capture group', function (done) {
+      var app = express()
+
+      app.get('/user/:user', function (req, res) {
+        res.end(req.params.user)
+      })
+
+      request(app).get('/user/tj').expect('tj', done)
+    })
+
+    it('should match a single segment only', function (done) {
+      var app = express()
+
+      app.get('/user/:user', function (req, res) {
+        res.end(req.params.user)
+      })
+
+      request(app).get('/user/tj/edit').expect(404, done)
+    })
+
+    it('should allow several capture groups', function (done) {
+      var app = express()
+
+      app.get('/user/:user/:op', function (req, res) {
+        res.end(req.params.op + 'ing ' + req.params.user)
+      })
+
+      request(app).get('/user/tj/edit').expect('editing tj', done)
+    })
+
+    it('should work following a partial capture group', function (done) {
+      var app = express()
+      var cb = after(2, done)
+
+      app.get('/user(s)?/:user/:op', function (req, res) {
+        res.end(
+          req.params.op +
+            'ing ' +
+            req.params.user +
+            (req.params[0] ? ' (old)' : '')
+        )
+      })
+
+      request(app).get('/user/tj/edit').expect('editing tj', cb)
+
+      request(app).get('/users/tj/edit').expect('editing tj (old)', cb)
+    })
+
+    it('should work inside literal parenthesis', function (done) {
+      var app = express()
+
+      app.get('/:user\\(:op\\)', function (req, res) {
+        res.end(req.params.op + 'ing ' + req.params.user)
+      })
+
+      request(app).get('/tj(edit)').expect('editing tj', done)
+    })
+
+    it('should work in array of paths', function (done) {
+      var app = express()
+      var cb = after(2, done)
+
+      app.get(['/user/:user/poke', '/user/:user/pokes'], function (req, res) {
+        res.end('poking ' + req.params.user)
+      })
+
+      request(app).get('/user/tj/poke').expect('poking tj', cb)
+
+      request(app).get('/user/tj/pokes').expect('poking tj', cb)
+    })
+  })
+
+  describe(':name?', function () {
+    it('should denote an optional capture group', function (done) {
+      var app = express()
+
+      app.get('/user/:user/:op?', function (req, res) {
+        var op = req.params.op || 'view'
+        res.end(op + 'ing ' + req.params.user)
+      })
+
+      request(app).get('/user/tj').expect('viewing tj', done)
+    })
+
+    it('should populate the capture group', function (done) {
+      var app = express()
+
+      app.get('/user/:user/:op?', function (req, res) {
+        var op = req.params.op || 'view'
+        res.end(op + 'ing ' + req.params.user)
+      })
+
+      request(app).get('/user/tj/edit').expect('editing tj', done)
+    })
+  })
+
+  describe('.:name', function () {
+    it('should denote a format', function (done) {
+      var app = express()
+      var cb = after(2, done)
+
+      app.get('/:name.:format', function (req, res) {
+        res.end(req.params.name + ' as ' + req.params.format)
+      })
+
+      request(app).get('/foo.json').expect(200, 'foo as json', cb)
+
+      request(app).get('/foo').expect(404, cb)
+    })
+  })
+
+  describe('.:name?', function () {
+    it('should denote an optional format', function (done) {
+      var app = express()
+      var cb = after(2, done)
+
+      app.get('/:name.:format?', function (req, res) {
+        res.end(req.params.name + ' as ' + (req.params.format || 'html'))
+      })
+
+      request(app).get('/foo').expect(200, 'foo as html', cb)
+
+      request(app).get('/foo.json').expect(200, 'foo as json', done)
+    })
+  })
+
+  describe('when next() is called', function () {
+    it('should continue lookup', function (done) {
+      var app = express(),
+        calls = []
+
+      app.get('/foo/:bar?', function (req, res, next) {
+        calls.push('/foo/:bar?')
+        next()
+      })
+
+      app.get('/bar', function (req, res) {
+        assert(0)
+      })
+
+      app.get('/foo', function (req, res, next) {
+        calls.push('/foo')
+        next()
+      })
+
+      app.get('/foo', function (req, res, next) {
+        calls.push('/foo 2')
+        res.json(calls)
+      })
+
+      request(app)
+        .get('/foo')
+        .expect(200, ['/foo/:bar?', '/foo', '/foo 2'], done)
+    })
+  })
+
+  describe('when next("route") is called', function () {
+    it('should jump to next route', function (done) {
+      var app = express()
+
+      function fn(req, res, next) {
+        res.set('X-Hit', '1')
+        next('route')
+      }
+
+      app.get('/foo', fn, function (req, res, next) {
+        res.end('failure')
+      })
+
+      app.get('/foo', function (req, res) {
+        res.end('success')
+      })
+
+      request(app).get('/foo').expect('X-Hit', '1').expect(200, 'success', done)
+    })
+  })
+
+  describe('when next("router") is called', function () {
+    it('should jump out of router', function (done) {
+      var app = express()
+      var router = express.Router()
+
+      function fn(req, res, next) {
+        res.set('X-Hit', '1')
+        next('router')
+      }
+
+      router.get('/foo', fn, function (req, res, next) {
+        res.end('failure')
+      })
+
+      router.get('/foo', function (req, res, next) {
+        res.end('failure')
+      })
+
+      app.use(router)
+
+      app.get('/foo', function (req, res) {
+        res.end('success')
+      })
+
+      request(app).get('/foo').expect('X-Hit', '1').expect(200, 'success', done)
+    })
+  })
+
+  describe('when next(err) is called', function () {
+    it('should break out of app.router', function (done) {
+      var app = express(),
+        calls = []
+
+      app.get('/foo/:bar?', function (req, res, next) {
+        calls.push('/foo/:bar?')
+        next()
+      })
+
+      app.get('/bar', function (req, res) {
+        assert(0)
+      })
+
+      app.get('/foo', function (req, res, next) {
+        calls.push('/foo')
+        next(new Error('fail'))
+      })
+
+      app.get('/foo', function (req, res, next) {
+        assert(0)
+      })
+
+      app.use(function (err, req, res, next) {
+        res.json({
+          calls: calls,
+          error: err.message,
+        })
+      })
+
+      request(app)
+        .get('/foo')
+        .expect(200, { calls: ['/foo/:bar?', '/foo'], error: 'fail' }, done)
+    })
+
+    it('should call handler in same route, if exists', function (done) {
+      var app = express()
+
+      function fn1(req, res, next) {
+        next(new Error('boom!'))
+      }
+
+      function fn2(req, res, next) {
+        res.send('foo here')
+      }
+
+      function fn3(err, req, res, next) {
+        res.send('route go ' + err.message)
+      }
+
+      app.get('/foo', fn1, fn2, fn3)
+
+      app.use(function (err, req, res, next) {
+        res.end('error!')
+      })
+
+      request(app).get('/foo').expect('route go boom!', done)
+    })
+  })
+
+  it('should allow rewriting of the url', function (done) {
+    var app = express()
+
+    app.get('/account/edit', function (req, res, next) {
+      req.user = { id: 12 } // faux authenticated user
+      req.url = '/user/' + req.user.id + '/edit'
+      next()
+    })
+
+    app.get('/user/:id/edit', function (req, res) {
+      res.send('editing user ' + req.params.id)
+    })
+
+    request(app).get('/account/edit').expect('editing user 12', done)
+  })
+
+  it('should run in order added', function (done) {
+    var app = express()
+    var path = []
+
+    app.get('*', function (req, res, next) {
+      path.push(0)
+      next()
+    })
+
+    app.get('/user/:id', function (req, res, next) {
+      path.push(1)
+      next()
+    })
+
+    app.use(function (req, res, next) {
+      path.push(2)
+      next()
+    })
+
+    app.all('/user/:id', function (req, res, next) {
+      path.push(3)
+      next()
+    })
+
+    app.get('*', function (req, res, next) {
+      path.push(4)
+      next()
+    })
+
+    app.use(function (req, res, next) {
+      path.push(5)
+      res.end(path.join(','))
+    })
+
+    request(app).get('/user/1').expect(200, '0,1,2,3,4,5', done)
+  })
+
+  it('should be chainable', function () {
+    var app = express()
+    assert.strictEqual(
+      app.get('/', function () {}),
+      app
+    )
+  })
 })
