@@ -1,23 +1,12 @@
 const express = require('./index')
 
 const app = express()
+const blog = express()
 
-app.param('user', function (req, res, next, user) {
-  if (user === 'foo') throw new Error('err!')
-  req.user = user
-  next()
-})
-
-app.get('/:user/bob', function (req, res, next) {
-  next()
-})
-app.get('/foo/:user', function (req, res, next) {
-  next()
-})
-
-app.use(function (err, req, res, next) {
-  res.status(500)
-  res.send(err.message)
+app.use('/admin', blog)
+blog.use(function (req, res, next) {
+  console.log(req.baseUrl, req.url, req.originalUrl)
+  res.send('helo')
 })
 
 app.listen(3000, () => {

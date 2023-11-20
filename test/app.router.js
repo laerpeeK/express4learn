@@ -232,6 +232,298 @@ describe('app.router', function () {
   })
 
   describe('params', function () {
-    
+    it('should overwrite existing req.params by default', function (done) {
+      const app = express()
+      const router = express.Router()
+
+      router.get('/:action', function (req, res) {
+        res.send(req.params)
+      })
+
+      app.use('/user/:user', router)
+
+      request(app).get('/user/1/get').expect(200, '{"action":"get"}', done)
+    })
+
+    it('should allow merging existing req.params', function (done) {
+      const app = express()
+      const router = express.Router({ mergeParams: true })
+
+      router.get('/:action', function (req, res) {
+        const keys = Object.keys(req.params).sort()
+        res.send(
+          keys.map(function (k) {
+            return [k, req.params[k]]
+          })
+        )
+      })
+
+      app.use('/user/:user', router)
+
+      request(app)
+        .get('/user/tj/get')
+        .expect(200, '[["action","get"],["user","tj"]]', done)
+    })
+
+    it('should use params from router', function (done) {
+      const app = express()
+      const router = express.Router({ mergeParams: true })
+
+      router.get('/:thing', function (req, res) {
+        const keys = Object.keys(req.params).sort()
+        res.send(
+          keys.map(function (k) {
+            return [k, req.params[k]]
+          })
+        )
+      })
+
+      app.use('/user/:thing', router)
+
+      request(app).get('/user/tj/get').expect(200, '[["thing","get"]]', done)
+    })
+
+    it('should merge numeric indices req.params', function (done) {
+      const app = express()
+      const router = express.Router({ mergeParams: true })
+
+      router.get('/*.*', function (req, res) {
+        const keys = Object.keys(req.params).sort()
+        res.send(
+          keys.map(function (k) {
+            return [k, req.params[k]]
+          })
+        )
+      })
+
+      app.use('/user/id:(\\d+)', router)
+
+      request(app)
+        .get('/user/id:10/profile.json')
+        .expect(200, '[["0","10"],["1","profile"],["2","json"]]', done)
+    })
+
+    it('should merge numeric indices req.params when more in parent', function (done) {
+      const app = express()
+      const router = express.Router({ mergeParams: true })
+
+      router.get('/*', function (req, res) {
+        const keys = Object.keys(req.params).sort()
+        res.send(
+          keys.map(function (k) {
+            return [k, req.params[k]]
+          })
+        )
+      })
+
+      app.use('/user/id:(\\d+)/name:(\\w+)', router)
+
+      request(app)
+        .get('/user/id:10/name:tj/profile')
+        .expect(200, '[["0","10"],["1","tj"],["2","profile"]]', done)
+    })
+
+    it('should merge numeric indices req.params when parent has same number', function (done) {
+      const app = express()
+      const router = express.Router({ mergeParams: true })
+
+      router.get('/name:(\\w+)', function (req, res) {
+        const keys = Object.keys(req.params).sort()
+        res.send(
+          keys.map(function (k) {
+            return [k, req.params[k]]
+          })
+        )
+      })
+
+      app.use('/user/id:(\\d+)', router)
+
+      request(app)
+        .get('/user/id:10/name:tj')
+        .expect(200, '[["0","10"],["1","tj"]]', done)
+    })
+
+    it('should ignore invalid incoming req.params', function (done) {
+      const app = express()
+      const router = express.Router({ mergeParams: true })
+
+      router.get('/:name', function (req, res) {
+        const keys = Object.keys(req.params).sort()
+        res.send(
+          keys.map(function (k) {
+            return [k, req.params[k]]
+          })
+        )
+      })
+
+      app.use('/user/', function (req, res, next) {
+        req.params = 3 // wat?
+        router(req, res, next)
+      })
+
+      request(app).get('/user/tj').expect(200, '[["name","tj"]]', done)
+    })
+
+    it('should restore req.params', function (done) {
+      const app = express()
+      const router = express.Router({ mergeParams: true })
+
+      router.get('/user:(\\w+)/*', function (req, res, next) {
+        next()
+      })
+
+      app.use('/user/id:(\\d+)', function (req, res, next) {
+        router(req, res, function (err) {
+          var keys = Object.keys(req.params).sort()
+          res.send(
+            keys.map(function (k) {
+              return [k, req.params[k]]
+            })
+          )
+        })
+      })
+
+      request(app)
+        .get('/user/id:42/user:tj/profile')
+        .expect(200, '[["0","42"]]', done)
+    })
+  })
+
+  describe('trailing slashes', function () {
+    it('should be optional by default', function (done) {
+      const app = express()
+
+      app.get('/user', function (req, res) {
+        res.end('tj')
+      })
+
+      request(app).get('/user/').expect('tj', done)
+    })
+
+    describe('when "strict routing" is enabled', function () {
+      it('should match trailing slashes', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.get('/user/', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app).get('/user/').expect('tj', done)
+      })
+
+      it('should pass-though middleware', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.use(function (req, res, next) {
+          res.setHeader('x-middleware', 'true')
+          next()
+        })
+
+        app.get('/user/', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app)
+          .get('/user/')
+          .expect('x-middleware', 'true')
+          .expect(200, 'tj', done)
+      })
+
+      it('should pass-though mounted middleware', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.use('/user/', function (req, res, next) {
+          res.setHeader('x-middleware', 'true')
+          next()
+        })
+
+        app.get('/user/test/', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app)
+          .get('/user/test/')
+          .expect('x-middleware', 'true')
+          .expect(200, 'tj', done)
+      })
+
+      it('should match no slashes', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.get('/user', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app).get('/user').expect('tj', done)
+      })
+
+      it('should match middleware when omitting the trailing slash', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.use('/user/', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app).get('/user').expect(200, 'tj', done)
+      })
+
+      it('should match middleware', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.use('/user', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app).get('/user').expect(200, 'tj', done)
+      })
+
+      it('should match middleware when adding the trailing slash', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.use('/user', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app).get('/user').expect(200, 'tj', done)
+      })
+
+      it('should fail when omitting the trailing slash', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.get('/user/', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app).get('/user').expect(404, done)
+      })
+
+      it('should fail when adding the trailing slash', function (done) {
+        const app = express()
+
+        app.enable('strict routing')
+
+        app.get('/user', function (req, res) {
+          res.end('tj')
+        })
+
+        request(app).get('/user/').expect(404, done)
+      })
+    })
   })
 })
