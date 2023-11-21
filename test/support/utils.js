@@ -10,9 +10,24 @@ const assert = require('node:assert')
  * @public
  */
 
+exports.shouldHaveBody = shouldHaveBody
 exports.shouldNotHaveHeader = shouldNotHaveHeader
 exports.shouldHaveHeaderValues = shouldHaveHeaderValues
 exports.shouldNotHaveBody = shouldNotHaveBody
+
+/**
+ * Assert that a supertest response has a specific body.
+ *
+ * @param {Buffer} buf
+ * @returns {function}
+ */
+function shouldHaveBody(buf) {
+  return function (res) {
+    const body = !Buffer.isBuffer(res.body) ? Buffer.from(res.text) : res.body
+    assert.ok(body, 'response has body')
+    assert.strictEqual(body.toString('hex'), buf.toString('hex'))
+  }
+}
 
 /**
  * Assert that a supertest response does not have a header
