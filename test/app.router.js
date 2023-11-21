@@ -701,7 +701,7 @@ describe('app.router', function () {
 
   describe(':name', function () {
     it('should denote a capture group', function (done) {
-      var app = express()
+      const app = express()
 
       app.get('/user/:user', function (req, res) {
         res.end(req.params.user)
@@ -711,7 +711,7 @@ describe('app.router', function () {
     })
 
     it('should match a single segment only', function (done) {
-      var app = express()
+      const app = express()
 
       app.get('/user/:user', function (req, res) {
         res.end(req.params.user)
@@ -721,7 +721,7 @@ describe('app.router', function () {
     })
 
     it('should allow several capture groups', function (done) {
-      var app = express()
+      const app = express()
 
       app.get('/user/:user/:op', function (req, res) {
         res.end(req.params.op + 'ing ' + req.params.user)
@@ -731,8 +731,8 @@ describe('app.router', function () {
     })
 
     it('should work following a partial capture group', function (done) {
-      var app = express()
-      var cb = after(2, done)
+      const app = express()
+      const cb = after(2, done)
 
       app.get('/user(s)?/:user/:op', function (req, res) {
         res.end(
@@ -749,7 +749,7 @@ describe('app.router', function () {
     })
 
     it('should work inside literal parenthesis', function (done) {
-      var app = express()
+      const app = express()
 
       app.get('/:user\\(:op\\)', function (req, res) {
         res.end(req.params.op + 'ing ' + req.params.user)
@@ -759,8 +759,8 @@ describe('app.router', function () {
     })
 
     it('should work in array of paths', function (done) {
-      var app = express()
-      var cb = after(2, done)
+      const app = express()
+      const cb = after(2, done)
 
       app.get(['/user/:user/poke', '/user/:user/pokes'], function (req, res) {
         res.end('poking ' + req.params.user)
@@ -774,10 +774,10 @@ describe('app.router', function () {
 
   describe(':name?', function () {
     it('should denote an optional capture group', function (done) {
-      var app = express()
+      const app = express()
 
       app.get('/user/:user/:op?', function (req, res) {
-        var op = req.params.op || 'view'
+        const op = req.params.op || 'view'
         res.end(op + 'ing ' + req.params.user)
       })
 
@@ -785,10 +785,10 @@ describe('app.router', function () {
     })
 
     it('should populate the capture group', function (done) {
-      var app = express()
+      const app = express()
 
       app.get('/user/:user/:op?', function (req, res) {
-        var op = req.params.op || 'view'
+        const op = req.params.op || 'view'
         res.end(op + 'ing ' + req.params.user)
       })
 
@@ -798,8 +798,8 @@ describe('app.router', function () {
 
   describe('.:name', function () {
     it('should denote a format', function (done) {
-      var app = express()
-      var cb = after(2, done)
+      const app = express()
+      const cb = after(2, done)
 
       app.get('/:name.:format', function (req, res) {
         res.end(req.params.name + ' as ' + req.params.format)
@@ -813,8 +813,8 @@ describe('app.router', function () {
 
   describe('.:name?', function () {
     it('should denote an optional format', function (done) {
-      var app = express()
-      var cb = after(2, done)
+      const app = express()
+      const cb = after(2, done)
 
       app.get('/:name.:format?', function (req, res) {
         res.end(req.params.name + ' as ' + (req.params.format || 'html'))
@@ -828,7 +828,7 @@ describe('app.router', function () {
 
   describe('when next() is called', function () {
     it('should continue lookup', function (done) {
-      var app = express(),
+      const app = express(),
         calls = []
 
       app.get('/foo/:bar?', function (req, res, next) {
@@ -858,7 +858,7 @@ describe('app.router', function () {
 
   describe('when next("route") is called', function () {
     it('should jump to next route', function (done) {
-      var app = express()
+      const app = express()
 
       function fn(req, res, next) {
         res.set('X-Hit', '1')
@@ -879,8 +879,8 @@ describe('app.router', function () {
 
   describe('when next("router") is called', function () {
     it('should jump out of router', function (done) {
-      var app = express()
-      var router = express.Router()
+      const app = express()
+      const router = express.Router()
 
       function fn(req, res, next) {
         res.set('X-Hit', '1')
@@ -907,7 +907,7 @@ describe('app.router', function () {
 
   describe('when next(err) is called', function () {
     it('should break out of app.router', function (done) {
-      var app = express(),
+      const app = express(),
         calls = []
 
       app.get('/foo/:bar?', function (req, res, next) {
@@ -941,7 +941,7 @@ describe('app.router', function () {
     })
 
     it('should call handler in same route, if exists', function (done) {
-      var app = express()
+      const app = express()
 
       function fn1(req, res, next) {
         next(new Error('boom!'))
@@ -966,7 +966,7 @@ describe('app.router', function () {
   })
 
   it('should allow rewriting of the url', function (done) {
-    var app = express()
+    const app = express()
 
     app.get('/account/edit', function (req, res, next) {
       req.user = { id: 12 } // faux authenticated user
@@ -982,8 +982,8 @@ describe('app.router', function () {
   })
 
   it('should run in order added', function (done) {
-    var app = express()
-    var path = []
+    const app = express()
+    const path = []
 
     app.get('*', function (req, res, next) {
       path.push(0)
@@ -1019,7 +1019,7 @@ describe('app.router', function () {
   })
 
   it('should be chainable', function () {
-    var app = express()
+    const app = express()
     assert.strictEqual(
       app.get('/', function () {}),
       app

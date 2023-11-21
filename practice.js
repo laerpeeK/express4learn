@@ -1,12 +1,26 @@
 const express = require('./index')
 
 const app = express()
-const blog = express()
 
-app.use('/admin', blog)
-blog.use(function (req, res, next) {
-  console.log(req.baseUrl, req.url, req.originalUrl)
-  res.send('helo')
+const router = express.Router()
+
+function fn(req, res, next) {
+  res.set('X-Hit', '1')
+  next('router')
+}
+
+router.get('/foo', fn, function (req, res, next) {
+  res.end('failure')
+})
+
+router.get('/foo', function (req, res, next) {
+  res.end('failure')
+})
+
+app.use(router)
+
+app.get('/foo', function (req, res) {
+  res.end('success')
 })
 
 app.listen(3000, () => {
