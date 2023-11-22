@@ -1,28 +1,16 @@
-const express = require('./index')
 
+const express = require('./')
+const path = require('path')
+const fixtures = path.join(__dirname, './test/fixtures')
 const app = express()
+const root = fixtures
 
-const router = express.Router()
+app.use(express.static(root))
 
-function fn(req, res, next) {
-  res.set('X-Hit', '1')
-  next('router')
-}
-
-router.get('/foo', fn, function (req, res, next) {
-  res.end('failure')
+app.use(function (req, res, next) {
+  res.sendStatus(404)
 })
 
-router.get('/foo', function (req, res, next) {
-  res.end('failure')
-})
-
-app.use(router)
-
-app.get('/foo', function (req, res) {
-  res.end('success')
-})
-
-app.listen(3000, () => {
-  console.log('the server is running at port 3000')
+app.listen(3000, function () {
+  console.log('running at port 3000')
 })
