@@ -10,7 +10,7 @@
 4. app.set、app.enable、app.disable、app.enabled、app.disabled等初始化时涉及到的app method。逻辑比较简单。
 5. app.request(理解Express是如何通过原型链修改req、相关HTTP头部功能、express新增的允许req.xx方法)
 6. app.response(理解Express是如何通过原型链修改res、相关HTTP头部功能、express新增的允许res.xx方法)
-7. 跑通单元测试(mocha、superagent、node中assert模块的基本使用)、不断的debugger...
+7. 跑通单元测试(mocha、supertest、node中assert模块的基本使用)、不断的debugger...
 8. 上述调试(req, res, app.use, app)基础流程中，相关第三方模块源码的了解。涉及到的第三方模块都是一些小模块，不复杂。
 9. router/index.js、router/layer.js。通过app.use方法调用。以及request.get('xx')触发回调。理清app -> router -> layer的一个流程。 比较复杂的是router.handle方法。但只需要关注核心逻辑 - function next。
 10. 粗浅了解下path-to-regexp这个库的功能。以及调用时options的作用。这个库在vue-router中也有用到。
