@@ -127,7 +127,7 @@ function read(req, res, next, parse, debug, options) {
  * @param {boolean} inflate
  */
 function contentstream(req, debug, inflate) {
-  const encoding = (req.headers['content-encoding'] || 'identity').toLowercase()
+  const encoding = (req.headers['content-encoding'] || 'identity').toLowerCase()
   const length = req.headers['content-length']
   let stream
 

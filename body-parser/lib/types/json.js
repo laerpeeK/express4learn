@@ -1,3 +1,3 @@
 module.exports = json
 
-function json () {}
+function json (options) {}
