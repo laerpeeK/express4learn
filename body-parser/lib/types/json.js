@@ -32,15 +32,15 @@ const FIRST_CHAR_REGEXP = /^[\x20\x09\x0a\x0d]*([^\x20\x09\x0a\x0d])/ // eslint-
 function json(options) {
   const opts = options || {}
 
-  const limit =
+  const limit = // 这是一个字符串或数字，用于指定请求体的大小限制。如果请求体的大小超过限制，将会返回一个413 Payload Too Large错误。默认为'100kb'。
     typeof opts.limit !== 'number'
       ? bytes.parse(opts.limit || '100kb')
       : opts.limit
-  const inflate = opts.inflate !== false
-  const reviver = opts.reviver
-  const strict = opts.strict !== false
-  const type = opts.type || 'application/json'
-  const verify = opts.verify || false
+  const inflate = opts.inflate !== false // 用于指定是否应该将gzip和deflate编码的请求体解压缩为原始的JSON字符串。默认为true。
+  const reviver = opts.reviver // 这是一个函数，用于在解析JSON时转换解析出的值。它类似于JSON.parse()函数的第二个参数。默认为null。
+  const strict = opts.strict !== false // 用于指定是否应该只接受数组和对象作为JSON。如果设置为false，则可以接受任何JSON类型。默认为true。
+  const type = opts.type || 'application/json' // 这是一个字符串或字符串数组，用于指定要解析的请求体的媒体类型。如果请求的Content-Type与此选项不匹配，将不会执行解析。默认为'application/json'。
+  const verify = opts.verify || false // 这是一个函数，用于在解析JSON之前对请求体进行自定义验证。如果验证失败，将会返回一个400 Bad Request错误。默认为undefined。
 
   if (verify !== false && typeof verify !== 'function') {
     throw new TypeError('option verify must be function')
